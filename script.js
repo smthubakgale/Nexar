@@ -26,29 +26,40 @@ class Component {
 
 class Resistor extends Component {
 	draw(ctx) {
-		ctx.beginPath();
-		ctx.rect(this.x, this.y, this.width, this.height);
-		ctx.fillStyle = 'black';
-		ctx.fill();
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		ctx.fillStyle = 'white';
-		ctx.font = '12px Arial';
-		ctx.fillText('1000Ω', this.x + this.width / 2, this.y + this.height / 2);
+		const svg = `
+			<svg width="${this.width}" height="${this.height}">
+				<rect x="0" y="0" width="${this.width}" height="${this.height}" fill="#000000" />
+				<text x="${this.width / 2}" y="${this.height / 2}" font-size="12" font-family="Arial" fill="#FFFFFF">1000Ω</text>
+				<svg x="10" y="5" width="30" height="10" viewBox="0 0 100 50">
+					<path d="M10,10 L90,10 L90,40 L10,40 Z" fill="#FFFFFF" />
+					<path d="M20,20 L80,20" stroke="#000000" stroke-width="5" />
+				</svg>
+			</svg>
+		`;
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(svg, 'image/svg+xml');
+		const svgElement = doc.documentElement;
+		ctx.drawImage(svgElement, this.x, this.y);
 	}
 }
 
 class VoltageSource extends Component {
 	draw(ctx) {
-		ctx.beginPath();
-		ctx.rect(this.x, this.y, this.width, this.height);
-		ctx.fillStyle = 'blue';
-		ctx.fill();
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		ctx.fillStyle = 'white';
-		ctx.font = '12px Arial';
-		ctx.fillText('12V', this.x + this.width / 2, this.y + this.height / 2);
+		const svg = `
+			<svg width="${this.width}" height="${this.height}">
+				<rect x="0" y="0" width="${this.width}" height="${this.height}" fill="#0000FF" />
+				<text x="${this.width / 2}" y="${this.height / 2}" font-size="12" font-family="Arial" fill="#FFFFFF">12V</text>
+				<svg x="10" y="5" width="30" height="10" viewBox="0 0 100 50">
+					<path d="M10,10 L90,10 L90,40 L10,40 Z" fill="#FFFFFF" />
+					<path d="M20,20 L80,20" stroke="#000000" stroke-width="5" />
+					<path d="M50,10 L50,40" stroke="#FF0000" stroke-width="5" />
+				</svg>
+			</svg>
+		`;
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(svg, 'image/svg+xml');
+		const svgElement = doc.documentElement;
+		ctx.drawImage(svgElement, this.x, this.y);
 	}
 }
 
@@ -147,5 +158,27 @@ canvas.addEventListener('mouseup', event => {
 	// Deselect the component
 	components.forEach(component => {
 		component.selected = false;
+	});
+});
+
+canvas.addEventListener('click', event => {
+	const x = event.clientX - canvas.offsetLeft;
+	const y = event.clientY - canvas.offsetTop;
+	
+	// Create a new wire
+	wires.push(new Wire(x, y, x, y));
+	draw();
+});
+
+canvas.addEventListener('dblclick', event => {
+	const x = event.clientX - canvas.offsetLeft;
+	const y = event.clientY - canvas.offsetTop;
+	
+	// Remove the wire
+	wires.forEach((wire, index) => {
+		if (wire.x1 === x && wire.y1 === y) {
+			wires.splice(index, 1);
+			draw();
+		}
 	});
 });
